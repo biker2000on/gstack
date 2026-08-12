@@ -104,9 +104,9 @@
       "voice_line": null
     },
     "gstack-upgrade": {
-      "lead": "Upgrade gstack to the latest version.",
-      "routing": "Detects global vs vendored install,\nruns the upgrade, and shows what's new. Use when asked to \"upgrade gstack\",\n\"update gstack\", or \"get latest version\".",
-      "voice_line": "Voice triggers (speech-to-text aliases): \"upgrade the tools\", \"update the tools\", \"gee stack upgrade\", \"g stack upgrade\"."
+      "lead": "Upgrade the customized gstack installation from biker2000on/gstack.",
+      "routing": "Detects\nClaude, Codex, Gemini, shared-repo, and vendored installs, preserves local\nchanges, rebuilds all host formats, and summarizes user-facing changes.",
+      "voice_line": null
     },
     "guard": {
       "lead": "Full safety mode: destructive command warnings + directory-scoped edits.",
@@ -122,31 +122,6 @@
       "lead": "Systematic debugging with root cause investigation.",
       "routing": "Four phases: investigate,\nanalyze, hypothesize, implement. Iron Law: no fixes without root cause.\nUse when asked to \"debug this\", \"fix this bug\", \"why is this broken\",\n\"investigate this error\", or \"root cause analysis\".\nProactively invoke this skill (do NOT debug directly) when the user reports\nerrors, 500 errors, stack traces, unexpected behavior, \"it was working\nyesterday\", or is troubleshooting why something stopped working.",
       "voice_line": null
-    },
-    "ios-clean": {
-      "lead": "Remove the DebugBridge SPM package and all #if DEBUG wiring from an iOS app.",
-      "routing": "Cleans up StateServer, DebugOverlay, accessor codegen output, and\napp-side hooks installed by /ios-qa. This is a convenience wrapper —\nthe structural Release-build guard (Package.swift conditional + CI\nswift build -c release check) is the safety-critical path.\nUse when asked to \"clean the iOS debug bridge\", \"remove DebugBridge\",\nor \"strip the gstack iOS instrumentation\".",
-      "voice_line": "Voice triggers (speech-to-text aliases): \"clean the iOS debug bridge\", \"remove DebugBridge\", \"strip the gstack iOS instrumentation\"."
-    },
-    "ios-design-review": {
-      "lead": "Visual design audit for iOS apps on real hardware.",
-      "routing": "Connects to a real\niPhone via the same StateServer as /ios-qa, screenshots every screen,\nevaluates against Apple HIG, DESIGN.md, and design best practices. Scores\neach dimension 0-10 with \"what would make it a 10\" framing — mirrors\n/plan-design-review for browser. For plan-stage design review (before\nimplementation), use /plan-design-review. For live web visual audits, use\n/design-review.\nUse when asked to \"review the iOS design\", \"audit the iPhone app's\nvisuals\", or \"design QA the iOS app\".",
-      "voice_line": "Voice triggers (speech-to-text aliases): \"review the iOS design\", \"audit the iPhone app's visuals\", \"design QA the iPhone app\"."
-    },
-    "ios-fix": {
-      "lead": "Autonomous iOS bug fixer.",
-      "routing": "Takes a bug found by /ios-qa, reads the source,\nwrites the fix, rebuilds, redeploys, and verifies the fix on the real\ndevice. Closes the loop: find bug → fix bug → confirm fix — zero human\nintervention. Captures the pre-bug state snapshot as a regression test\nfixture, so the bug can never recur silently.\nUse when /ios-qa reports a bug and you want it fixed automatically, or\nwhen asked to \"fix this iOS bug\", \"patch the iPhone app\", or \"auto-fix\nthe iOS issue\".",
-      "voice_line": "Voice triggers (speech-to-text aliases): \"fix the iOS bug\", \"patch the iPhone app\", \"auto-fix the iOS issue\"."
-    },
-    "ios-qa": {
-      "lead": "Live-device iOS QA for SwiftUI apps.",
-      "routing": "Connects to a real iPhone via USB\nCoreDevice IPv6 tunnel, reads Swift source to understand every screen, then\nruns a vision-driven agent loop: screenshot → analyze → decide → act →\nverify → repeat. All interaction happens via HTTP to an embedded\nStateServer in the app under test. Optionally exposes the device over\nTailscale so remote agents (OpenClaw, Codex, any HTTP-capable agent) can\nrun iOS QA from anywhere without touching the hardware.\nUse when asked to \"ios qa\", \"test my iPhone app\", \"find bugs on the device\",\nor \"qa the iOS app\".",
-      "voice_line": "Voice triggers (speech-to-text aliases): \"iOS quality check\", \"test the iPhone app\", \"run iOS QA\"."
-    },
-    "ios-sync": {
-      "lead": "Regenerate the iOS debug bridge against the latest upstream gstack templates.",
-      "routing": "Updates StateServer.swift, DebugOverlay.swift, Package.swift,\nand the typed @Observable state accessors. Use after you upgrade gstack\nor add new ViewModels/properties that need accessor coverage.\nUse when asked to \"resync the iOS debug bridge\", \"regenerate iOS\naccessors\", or \"update the gstack iOS instrumentation\".",
-      "voice_line": "Voice triggers (speech-to-text aliases): \"resync the iOS debug bridge\", \"regenerate iOS accessors\", \"update the gstack iOS instrumentation\"."
     },
     "land-and-deploy": {
       "lead": "Land and deploy workflow.",
@@ -180,7 +155,7 @@
     },
     "pair-agent": {
       "lead": "Pair a remote AI agent with your browser.",
-      "routing": "One command generates a setup key and\nprints instructions the other agent can follow to connect. Works with OpenClaw,\nHermes, Codex, Cursor, or any agent that can make HTTP requests. The remote agent\ngets its own tab with scoped access (read+write by default, admin on request).\nUse when asked to \"pair agent\", \"connect agent\", \"share browser\", \"remote browser\",\n\"let another agent use my browser\", or \"give browser access\".",
+      "routing": "One command generates a setup key and\nprints instructions the other agent can follow to connect. Works with Claude,\nCodex, Gemini, Cursor, or any agent that can make HTTP requests. The remote agent\ngets its own tab with scoped access (read+write by default, admin on request).\nUse when asked to \"pair agent\", \"connect agent\", \"share browser\", \"remote browser\",\n\"let another agent use my browser\", or \"give browser access\".",
       "voice_line": "Voice triggers (speech-to-text aliases): \"pair agent\", \"connect agent\", \"share my browser\", \"remote browser access\"."
     },
     "plan-ceo-review": {
@@ -243,11 +218,6 @@
       "routing": "Detects your deploy\nplatform (Fly.io, Render, Vercel, Netlify, Heroku, GitHub Actions, custom),\nproduction URL, health check endpoints, and deploy status commands. Writes\nthe configuration to CLAUDE.md so all future deploys are automatic.\nUse when: \"setup deploy\", \"configure deployment\", \"set up land-and-deploy\",\n\"how do I deploy with gstack\", \"add deploy config\".",
       "voice_line": null
     },
-    "setup-gbrain": {
-      "lead": "Set up gbrain for this coding agent: install the CLI, initialize a local PGLite or Supabase brain, register MCP, capture per-remote trust policy.",
-      "routing": "One command from zero to \"gbrain is running, and this agent\ncan call it.\" Use when: \"setup gbrain\", \"connect gbrain\", \"start\ngbrain\", \"install gbrain\", \"configure gbrain for this machine\".",
-      "voice_line": null
-    },
     "ship": {
       "lead": "Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR.",
       "routing": "Use when asked to \"ship\", \"deploy\",\n\"push to main\", \"create a PR\", \"merge and push\", or \"get it deployed\".\nProactively invoke this skill (do NOT push/PR directly) when the user says code\nis ready, asks about deploying, wants to push code up, or asks to create a PR.",
@@ -261,11 +231,6 @@
     "spec": {
       "lead": "Turn vague intent into a precise, executable spec in five phases.",
       "routing": "Files the issue,\noptionally spawns a Claude Code agent in a fresh worktree, and lets /ship close\nthe source issue on merge. Use when asked to \"spec this out\", \"file an issue\",\n\"write up a ticket\", \"make this a GitHub issue\", or \"turn this into a backlog item\".",
-      "voice_line": null
-    },
-    "sync-gbrain": {
-      "lead": "Keep gbrain current with this repo's code and refresh agent search guidance in CLAUDE.md. Wraps the gstack-gbrain-sync orchestrator with state",
-      "routing": "probing, native code-surface registration, capability checks,\nand a verdict block. Re-runnable, idempotent. Use when: \"sync gbrain\",\n\"refresh gbrain\", \"re-index this repo\", \"gbrain search isn't finding\nthings\".",
       "voice_line": null
     },
     "unfreeze": {

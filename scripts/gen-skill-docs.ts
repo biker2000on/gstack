@@ -26,57 +26,6 @@ import type { HostConfig } from './host-config';
 const ROOT = path.resolve(import.meta.dir, '..');
 const DRY_RUN = process.argv.includes('--dry-run');
 
-// ─── GBrain Detection Override ──────────────────────────────
-// When --respect-detection is passed, read ~/.gstack/gbrain-detection.json
-// and un-suppress GBRAIN_CONTEXT_LOAD + GBRAIN_SAVE_RESULTS for hosts that
-// statically suppress them (claude, codex, slate, factory, opencode,
-// openclaw, cursor, kiro). Detection state is produced by
-// bin/gstack-gbrain-detect and persisted by `gstack-config gbrain-refresh`
-// or by ./setup.
-//
-// Default (no flag): static suppressedResolvers honored as-is. Used by
-// `bun run gen:skill-docs` (CI + canonical checked-in SKILL.md files) so
-// the committed output is reproducible regardless of any developer's
-// local gbrain installation state. Use `bun run gen:skill-docs:user`
-// (which adds --respect-detection) for user-local installs.
-const RESPECT_DETECTION = process.argv.includes('--respect-detection');
-
-function loadGbrainOverride(): { detected: boolean } {
-  if (!RESPECT_DETECTION) return { detected: false };
-  const stateDir = process.env.GSTACK_HOME || path.join(process.env.HOME || '', '.gstack');
-  const detectionPath = path.join(stateDir, 'gbrain-detection.json');
-  try {
-    const json = JSON.parse(fs.readFileSync(detectionPath, 'utf-8')) as { gbrain_local_status?: string };
-    // "timeout" = slow-but-healthy engine (#1964); "thin-client" = remote-HTTP
-    // MCP brain with no local engine by design (#2051). Both usable — same
-    // treatment as "ok", matching gstack-gbrain-detect --is-ok.
-    return {
-      detected:
-        json.gbrain_local_status === 'ok' ||
-        json.gbrain_local_status === 'timeout' ||
-        json.gbrain_local_status === 'thin-client',
-    };
-  } catch {
-    return { detected: false };
-  }
-}
-
-const GBRAIN_OVERRIDE = loadGbrainOverride();
-
-/**
- * Compute effective suppressedResolvers for a host, applying the gbrain
- * detection override when enabled. When the override fires, GBRAIN_*
- * resolvers are removed from the suppression set so they render in the
- * generated SKILL.md.
- */
-function effectiveSuppressedResolvers(hostConfig: HostConfig): Set<string> {
-  let list = hostConfig.suppressedResolvers || [];
-  if (GBRAIN_OVERRIDE.detected) {
-    list = list.filter(r => r !== 'GBRAIN_CONTEXT_LOAD' && r !== 'GBRAIN_SAVE_RESULTS');
-  }
-  return new Set(list);
-}
-
 // ─── Host Detection (config-driven) ─────────────────────────
 
 const HOST_ARG = process.argv.find(a => a.startsWith('--host'));
@@ -149,10 +98,7 @@ const EXPLAIN_LEVEL: 'default' | 'terse' = (() => {
 // --out-dir <abs-dir> redirects Claude SKILL.md + section output to a separate
 // (untracked) directory instead of writing in place, AND rewrites the literal
 // section-base path (`~/.claude/skills/gstack/<skill>/sections/`) inside the
-// generated content to point at the out-dir, so section Reads resolve to the
-// rendered copy rather than the global install. Used by bin/dev-setup to render
-// the gbrain `:user` variant for a Conductor workspace without dirtying tracked
-// source. Default (unset) = in-place, behavior unchanged. Claude host only.
+// generated content to point at the out-dir. Default is in-place generation.
 const OUT_DIR_ARG = process.argv.find(a => a.startsWith('--out-dir'));
 const OUT_DIR: string | null = (() => {
   if (!OUT_DIR_ARG) return null;
@@ -497,7 +443,8 @@ function condenseOpenAIShortDescription(description: string): string {
   return `${safe}...`;
 }
 
-function generateOpenAIYaml(displayName: string, shortDescription: string): string {
+function generateOpenAIYaml(skillName: string, shortDescription: string): string {
+  const displayName = `gstack: ${skillName.replace(/^gstack-/, '')}`;
   return `interface:
   display_name: ${JSON.stringify(displayName)}
   short_description: ${JSON.stringify(shortDescription)}
@@ -676,10 +623,7 @@ function resolvePlaceholders(
   hostConfig: HostConfig,
   relTmplPath: string,
 ): string {
-  // effectiveSuppressedResolvers() honors --respect-detection: when gbrain is
-  // detected locally, GBRAIN_* resolvers un-suppress. Shared by SKILL.md and
-  // section generation so both paths get the same gbrain-aware behavior.
-  const suppressed = effectiveSuppressedResolvers(hostConfig);
+  const suppressed = new Set(hostConfig.suppressedResolvers || []);
   const onePass = (input: string): string =>
     input.replace(/\{\{(\w+(?::[^}]+)?)\}\}/g, (_match, fullKey) => {
       const parts = fullKey.split(':');
@@ -779,6 +723,9 @@ function processExternalHost(
 
   // Transform frontmatter (host-aware)
   let result = transformFrontmatter(content, host);
+  // External hosts require the frontmatter identifier to match the generated
+  // gstack-* directory name. This is especially important for Gemini CLI.
+  result = result.replace(/^name:\s*[^\n]+/m, `name: ${name}`);
 
   // Insert safety advisory at the top of the body (after frontmatter)
   if (safetyProse) {
@@ -1059,68 +1006,6 @@ for (const currentHost of hostsToRun) {
         lines: content.split('\n').length,
         tokens: Math.round(content.length / 4),
       });
-    }
-
-    // Generate gstack-lite and gstack-full for OpenClaw host
-    if (currentHost === 'openclaw' && !DRY_RUN) {
-      const openclawDir = path.join(ROOT, 'openclaw');
-      if (!fs.existsSync(openclawDir)) fs.mkdirSync(openclawDir, { recursive: true });
-
-      const gstackLite = `# gstack-lite Planning Discipline
-
-Injected by the orchestrator into spawned Claude Code sessions. Append to existing CLAUDE.md.
-
-## Planning Discipline
-1. Read every file you will modify. Understand existing patterns first.
-2. Before writing code, state your plan: what, why, which files, test case, risk.
-3. When ambiguous, prefer: completeness over shortcuts, existing patterns over new ones,
-   reversible choices over irreversible ones, safe defaults over clever ones.
-4. Self-review your changes before reporting done. Check for: missed files, broken
-   imports, untested paths, style inconsistencies.
-5. Report when done: what shipped, what decisions you made, anything uncertain.
-`;
-      fs.writeFileSync(path.join(openclawDir, 'gstack-lite-CLAUDE.md'), gstackLite);
-      console.log('GENERATED: openclaw/gstack-lite-CLAUDE.md');
-
-      const gstackFull = `# gstack-full Pipeline
-
-Injected by the orchestrator for complete feature builds. Append to existing CLAUDE.md.
-
-## Full Pipeline
-1. Read CLAUDE.md and understand the project context.
-2. Run /autoplan to review your approach (CEO + eng + design review pipeline).
-3. Implement the approved plan. Follow the planning discipline above.
-4. Run /ship to create a PR with tests, changelog, and version bump.
-5. Report back: PR URL, what shipped, decisions made, anything uncertain.
-
-Do not ask for human input until the PR is ready for review.
-`;
-      fs.writeFileSync(path.join(openclawDir, 'gstack-full-CLAUDE.md'), gstackFull);
-      console.log('GENERATED: openclaw/gstack-full-CLAUDE.md');
-
-      const gstackPlan = `# gstack-plan: Full Review Gauntlet
-
-Injected by the orchestrator when the user wants to plan a Claude Code project.
-Append to existing CLAUDE.md.
-
-## Planning Pipeline
-1. Read CLAUDE.md and understand the project context.
-2. Run /office-hours to produce a design doc (problem statement, premises, alternatives).
-3. Run /autoplan to review the design (CEO + eng + design + DX reviews + codex adversarial).
-4. Save the final reviewed plan to a file the orchestrator can reference later.
-   Write it to: plans/<project-slug>-plan-<date>.md in the current repo.
-   Include the design doc, all review decisions, and the implementation sequence.
-5. Report back to the orchestrator:
-   - Plan file path
-   - One-paragraph summary of what was designed and the key decisions
-   - List of accepted scope expansions (if any)
-   - Recommended next step (usually: spawn a new session with gstack-full to implement)
-
-Do not implement anything. This is planning only.
-The orchestrator will persist the plan link to its own memory/knowledge store.
-`;
-      fs.writeFileSync(path.join(openclawDir, 'gstack-plan-CLAUDE.md'), gstackPlan);
-      console.log('GENERATED: openclaw/gstack-plan-CLAUDE.md');
     }
 
     if (DRY_RUN && hasChanges) {

@@ -9,7 +9,7 @@
  * Built on lib/jsonl-store.ts (shared injection-reject + atomic append + tolerant
  * read). Free-text fields are injection-checked AND redact-scanned on write
  * (HIGH-tier secret → reject), so a secret never silently persists and resurfaced
- * text can't carry instructions. gbrain is never required — this is the reliable
+ * text can't carry instructions. The local store is the reliable
  * file-only core; semantic recall is a later, optional enhancement.
  */
 

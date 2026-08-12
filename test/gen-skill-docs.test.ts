@@ -363,10 +363,7 @@ describe('gen-skill-docs', () => {
     // (Artifacts Sync, Context Recovery, Routing Injection are load-bearing
     // functionality, not optional). Budget is set to current size + small
     // headroom; ratchet down if a future slim trims real bytes.
-    // Ratcheted from 33000 → 35000 when the gbrain context-load block was
-    // added (per /sync-gbrain plan §4). Ratcheted 35000 → 36500 in v1.27.0.0
-    // when generate-brain-sync-block.ts gained the gbrain_mcp_mode probe +
-    // remote-mode ARTIFACTS_SYNC status line (Path 4 of /setup-gbrain).
+    // Historical size ceiling retained to catch accidental preamble growth.
     // Ratcheted 36500 → 39000 in the contributor wave when #1205 added the
     // \\u-escape CJK rule (rule 12 + self-check item) to the AskUserQuestion
     // preamble.
@@ -3059,10 +3056,10 @@ describe('plan-mode-info resolver (handshake-replacement)', () => {
   });
 
   test('vestigial handshake is absent from non-Claude host outputs when present on disk', () => {
-    // Non-Claude hosts render to hostSubdirs (.agents/, .openclaw/, etc). The
+    // Non-Claude hosts render to hostSubdirs (.agents/, .gemini/, etc). The
     // plan-mode-info resolver has no host-scoping — all hosts get the new
     // section, none get the old handshake. Scan all candidate host dirs.
-    const hostDirs = ['.agents', '.openclaw', '.opencode', '.factory', '.hermes', '.kiro', '.cursor', '.slate'];
+    const hostDirs = ['.agents', '.gemini', '.opencode', '.factory', '.kiro', '.cursor', '.slate'];
     let checked = 0;
     for (const host of hostDirs) {
       const skillsRoot = path.join(ROOT, host, 'skills');

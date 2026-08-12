@@ -34,15 +34,8 @@ import { generateTelemetryPrompt } from './preamble/generate-telemetry-prompt';
 import { generateProactivePrompt } from './preamble/generate-proactive-prompt';
 import { generateFirstRunGuidance } from './preamble/generate-first-run-guidance';
 import { generateRoutingInjection } from './preamble/generate-routing-injection';
-import { generateVendoringDeprecation } from './preamble/generate-vendoring-deprecation';
 import { generateSpawnedSessionCheck } from './preamble/generate-spawned-session-check';
 import { generateWritingStyleMigration } from './preamble/generate-writing-style-migration';
-
-// Host-specific instructions
-import { generateBrainHealthInstruction } from './preamble/generate-brain-health-instruction';
-
-// GBrain cross-machine sync (runs at skill start; end-side handled in completion-status)
-import { generateBrainSyncBlock } from './preamble/generate-brain-sync-block';
 
 // Behavioral / voice
 import { generateVoiceDirective } from './preamble/generate-voice-directive';
@@ -97,15 +90,12 @@ export function generatePreamble(ctx: TemplateContext): string {
     generateProactivePrompt(ctx),
     generateFirstRunGuidance(ctx),
     generateRoutingInjection(ctx),
-    generateVendoringDeprecation(ctx),
     generateSpawnedSessionCheck(),
-    generateBrainHealthInstruction(ctx),
     // AskUserQuestion Format renders BEFORE the model overlay so the pacing rule
     // is the ambient default; the overlay's behavioral nudges land as subordinate
     // patches. Opus 4.7 reads top-to-bottom and absorbs the first pacing directive
     // it hits; reversing this order regresses plan-review cadence (v1.6.4.0 bug).
     ...(tier >= 2 ? [generateAskUserFormat(ctx)] : []),
-    generateBrainSyncBlock(ctx),
     generateModelOverlay(ctx),
     generateVoiceDirective(tier),
     ...(tier >= 2 ? [

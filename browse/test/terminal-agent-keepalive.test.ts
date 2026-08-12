@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'bun:test';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 // v1.44 WS keepalive — static-grep invariants for the protocol contract.
 //
@@ -11,8 +12,9 @@ import * as path from 'path';
 // regressed by a refactor. These tests fail CI if either side stops sending
 // or stops accepting the protocol frames.
 
-const AGENT_TS = path.resolve(new URL(import.meta.url).pathname, '..', '..', 'src', 'terminal-agent.ts');
-const CLIENT_JS = path.resolve(new URL(import.meta.url).pathname, '..', '..', '..', 'extension', 'sidepanel-terminal.js');
+const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
+const AGENT_TS = path.resolve(TEST_DIR, '..', 'src', 'terminal-agent.ts');
+const CLIENT_JS = path.resolve(TEST_DIR, '..', '..', 'extension', 'sidepanel-terminal.js');
 
 describe('terminal-agent WS keepalive (v1.44+)', () => {
   test('1. agent has a KEEPALIVE_INTERVAL_MS env knob, default 25000', () => {

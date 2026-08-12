@@ -35,8 +35,8 @@ const STABLE_OUTPUTS = [
 
 /**
  * Sampled outputs from EVERY non-Claude host. The full host-all run touches
- * .agents/, .cursor/, .factory/, .gbrain/, .hermes/, .kiro/, .openclaw/,
- * .opencode/, .slate/ — picking one canonical file per host catches per-host
+ * .agents/, .gemini/, .cursor/, .factory/, .kiro/, .opencode/, and .slate/
+ * — picking one canonical file per host catches per-host
  * non-determinism without paying the cost of snapshotting hundreds of files.
  */
 const STABLE_HOST_ALL_OUTPUTS = [
@@ -46,7 +46,7 @@ const STABLE_HOST_ALL_OUTPUTS = [
   '.agents/skills/gstack-ship/SKILL.md',
   '.cursor/skills/gstack-ship/SKILL.md',
   '.factory/skills/gstack-ship/SKILL.md',
-  '.gbrain/skills/gstack-ship/SKILL.md',
+  '.gemini/skills/gstack-ship/SKILL.md',
 ];
 
 function runGen(extraArgs: string[] = []): { exitCode: number; stderr: string } {
@@ -125,9 +125,9 @@ describe('gen-skill-docs idempotency', () => {
   }, 90_000);
 
   test('--host all idempotency: every host output is byte-stable across two runs', () => {
-    // Gap A: the default test above runs Claude host only. Non-Claude hosts
-    // (Codex, Factory, Cursor, OpenClaw, GBrain, Slate, OpenCode, Hermes,
-    // Kiro) have their own output paths and could carry their own
+    // Gap A: the default test above runs Claude host only. External hosts
+    // (Codex, Gemini, Factory, Cursor, Slate, OpenCode, and Kiro) have their own
+    // output paths and could carry their own
     // non-deterministic fields. We hit a "--host all needed for freshness
     // check" mid-/ship; this test pins the contract across every host.
     const firstRun = runGen(['--host', 'all']);

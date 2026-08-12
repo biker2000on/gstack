@@ -99,13 +99,6 @@ fi
 _ROUTING_DECLINED=$(${ctx.paths.binDir}/gstack-config get routing_declined 2>/dev/null || echo "false")
 echo "HAS_ROUTING: $_HAS_ROUTING"
 echo "ROUTING_DECLINED: $_ROUTING_DECLINED"
-_VENDORED="no"
-if [ -d ".claude/skills/gstack" ] && [ ! -L ".claude/skills/gstack" ]; then
-  if [ -f ".claude/skills/gstack/VERSION" ] || [ -d ".claude/skills/gstack/.git" ]; then
-    _VENDORED="yes"
-  fi
-fi
-echo "VENDORED_GSTACK: $_VENDORED"
 echo "MODEL_OVERLAY: ${ctx.model ?? 'none'}"
 _CHECKPOINT_MODE=$(${ctx.paths.binDir}/gstack-config get checkpoint_mode 2>/dev/null || echo "explicit")
 _CHECKPOINT_PUSH=$(${ctx.paths.binDir}/gstack-config get checkpoint_push 2>/dev/null || echo "false")
@@ -124,16 +117,5 @@ else
   export GSTACK_PLAN_MODE="inactive"
 fi
 echo "GSTACK_PLAN_MODE: $GSTACK_PLAN_MODE"
-[ -n "$OPENCLAW_SESSION" ] && echo "SPAWNED_SESSION: true" || true${ctx.host === 'gbrain' || ctx.host === 'hermes' ? `
-if command -v gbrain &>/dev/null; then
-  _BRAIN_JSON=$(gbrain doctor --fast --json 2>/dev/null || echo '{}')
-  _BRAIN_SCORE=$(echo "$_BRAIN_JSON" | grep -o '"health_score":[0-9]*' | cut -d: -f2)
-  _BRAIN_FAILS=$(echo "$_BRAIN_JSON" | grep -o '"status":"fail"' | wc -l | tr -d ' ')
-  _BRAIN_WARNS=$(echo "$_BRAIN_JSON" | grep -o '"status":"warn"' | wc -l | tr -d ' ')
-  echo "BRAIN_HEALTH: \${_BRAIN_SCORE:-unknown} (\${_BRAIN_FAILS:-0} failures, \${_BRAIN_WARNS:-0} warnings)"
-  if [ "\${_BRAIN_SCORE:-100}" -lt 50 ] 2>/dev/null; then
-    echo "$_BRAIN_JSON" | grep -o '"name":"[^"]*","status":"[^"]*","message":"[^"]*"' || true
-  fi
-fi` : ''}
 \`\`\``;
 }

@@ -1,7 +1,7 @@
 {
   "name": "gstack",
   "version": "1.62.0.0",
-  "description": "Garry's Stack — Claude Code skills + fast headless browser. One repo, one install, entire AI engineering workflow.",
+  "description": "A namespaced AI engineering workflow for Claude Code, OpenAI Codex, and Gemini CLI.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -68,6 +68,8 @@
     "headless",
     "cli",
     "claude",
+    "codex",
+    "gemini",
     "ai-agent",
     "devtools"
   ],

@@ -99,12 +99,52 @@ const WINDOWS_FRAGILE_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
 // the failure mode is structural rather than detectable via source-file scan.
 const KNOWN_WINDOWS_INCOMPATIBLE: Array<{ file: string; reason: string }> = [
   {
-    file: 'test/host-config.test.ts',
-    reason: 'asserts "claude" binary on PATH (only true when running inside Claude Code, not on bare CI runner)',
+    file: 'test/question-preference-hook.test.ts',
+    reason: 'executes a Claude hook with a bash shebang directly; Windows CreateProcess does not parse shebangs',
+  },
+  {
+    file: 'test/auq-error-fallback-hook.test.ts',
+    reason: 'executes a Claude hook with a bash shebang directly; Windows CreateProcess does not parse shebangs',
+  },
+  {
+    file: 'test/question-log-hook.test.ts',
+    reason: 'executes a Claude hook with a bash shebang directly; Windows CreateProcess does not parse shebangs',
   },
   {
     file: 'browse/test/findport.test.ts',
     reason: 'asserts Bun.serve.stop() is fire-and-forget — Bun behavior differs on Windows for this polyfill',
+  },
+  {
+    file: 'browse/test/server-embedder-terminal-port.test.ts',
+    reason: 'asserts POSIX signal-0 PID probes that are not observable through Windows process semantics',
+  },
+  {
+    file: 'browse/test/xvfb.test.ts',
+    reason: 'exercises Linux Xvfb ownership checks that shell out to ps',
+  },
+  {
+    file: 'test/regression-pr1169-build-app-sed.test.ts',
+    reason: 'executes the macOS build-app shell pipeline and requires POSIX sed/bash behavior',
+  },
+  {
+    file: 'test/setup-conductor-worktree.test.ts',
+    reason: 'exercises BSD ln and bash symlink semantics that do not exist on Windows',
+  },
+  {
+    file: 'test/context-save-hardening.test.ts',
+    reason: 'executes POSIX shell fragments with find/sed/head and Unix path assertions',
+  },
+  {
+    file: 'test/memory-cache-injection.test.ts',
+    reason: 'executes a Claude hook with a bash shebang directly; Windows CreateProcess does not parse shebangs',
+  },
+  {
+    file: 'test/migration-checkpoint-ownership.test.ts',
+    reason: 'executes the POSIX checkpoint migration script and asserts Unix ownership and symlink behavior',
+  },
+  {
+    file: 'browse/test/bun-polyfill.test.ts',
+    reason: 'exercises the Node compatibility polyfill through POSIX-style child command assumptions',
   },
 ];
 

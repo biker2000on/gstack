@@ -23,29 +23,6 @@ triggers:
   - design system
   - create a brand
   - design from scratch
-gbrain:
-  schema: 1
-  context_queries:
-    - id: existing-design-md
-      kind: filesystem
-      glob: "DESIGN.md"
-      tail: 1
-      render_as: "## Existing DESIGN.md (if any)"
-    - id: prior-design-decisions
-      kind: filesystem
-      glob: "~/.gstack/projects/{repo_slug}/*-design-*.md"
-      sort: mtime_desc
-      limit: 3
-      render_as: "## Prior design decisions for this project"
-    - id: brand-guidelines
-      kind: list
-      filter:
-        type: ceo-plan
-        tags_contains: "repo:{repo_slug}"
-        content_contains: "brand"
-      sort: updated_at_desc
-      limit: 3
-      render_as: "## Brand-related notes from CEO plans"
 ---
 
 {{PREAMBLE}}
@@ -106,7 +83,6 @@ If `DESIGN_NOT_AVAILABLE`: Phase 5 falls back to the HTML preview page (still go
 
 ---
 
-{{GBRAIN_CONTEXT_LOAD}}
 
 {{LEARNINGS_SEARCH}}
 
@@ -200,7 +176,6 @@ If the user said no research, skip entirely and proceed to Phase 3 using your bu
 {{SECTION:proposal-and-preview}}
 {{LEARNINGS_LOG}}
 
-{{GBRAIN_SAVE_RESULTS}}
 
 ## Important Rules
 

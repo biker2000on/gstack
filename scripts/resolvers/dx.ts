@@ -51,7 +51,7 @@ Internalize these; don't enumerate them.
 7. **Upgrade fear** — Will this break my production app? Clear changelogs, migration guides, codemods, deprecation warnings. Upgrades should be boring.
 8. **SDK completeness** — If devs write their own HTTP wrapper, you failed. If the SDK works in 4 of 5 languages, the fifth community hates you.
 9. **Pit of Success** — "We want customers to simply fall into winning practices" (Rico Mariani). Make the right thing easy, the wrong thing hard.
-10. **Progressive disclosure** — Simple case is production-ready, not a toy. Complex case uses the same API. SwiftUI: \\\`Button("Save") { save() }\\\` → full customization, same API.
+10. **Progressive disclosure** — Simple case is production-ready, not a toy. Complex case uses the same API. Example: \\\`saveButton.onClick(save)\\\` → full customization, same API.
 
 ## DX Scoring Rubric (0-10 calibration)
 

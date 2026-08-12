@@ -37,7 +37,6 @@ mkdirSync(dirname(paths.log), { recursive: true });
 
 function enqueue(): void {
   // Fire-and-forget cross-machine sync (no-op when artifacts_sync is off).
-  spawnSync(`${HERE}/gstack-brain-enqueue`, [`projects/${slug}/decisions.jsonl`], { stdio: "ignore" });
 }
 
 if (args.includes("--compact")) {

@@ -15,6 +15,7 @@
 import { describe, test, expect } from "bun:test";
 import { spawnSync } from "child_process";
 import * as path from "path";
+import { pathToFileURL } from "url";
 import { parseIntFlag } from "../design/src/flag-utils";
 
 const ROOT = path.resolve(import.meta.dir, "..");
@@ -90,8 +91,9 @@ describe("parseIntFlag contract (#2032, codex 17a-c)", () => {
 
 describe("normalizeIntFlag CLI wrapper (exit-1 semantics)", () => {
   function runWrapper(rawExpr: string, specExpr: string): { status: number; stderr: string } {
+    const moduleUrl = pathToFileURL(path.join(ROOT, "design", "src", "flag-utils.ts")).href;
     const script = `
-      import { normalizeIntFlag } from "${ROOT}/design/src/flag-utils";
+      import { normalizeIntFlag } from "${moduleUrl}";
       const v = normalizeIntFlag(${rawExpr}, ${specExpr});
       console.log("VALUE:" + v);
     `;

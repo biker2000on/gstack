@@ -165,7 +165,9 @@ describe('SKILL.md size budget regression (gate, free)', () => {
     // by the sectioned invariant in parity-harness.ts (minBytes on the
     // skeleton+sections union), so exempt the skeleton from the body-strip floor.
     // EQ1: derived from the canonical CARVE_GUARDS registry — no parallel list.
-    const SECTIONS_EXTRACTED = new Set<string>(CARVED_SKILLS);
+    // The custom fork intentionally replaces the migration-heavy upstream
+    // upgrader with a compact, host-neutral fast-forward workflow.
+    const SECTIONS_EXTRACTED = new Set<string>([...CARVED_SKILLS, 'gstack-upgrade']);
 
     const undershoots: Array<{
       skill: string; beforeBytes: number; afterBytes: number; ratio: number;

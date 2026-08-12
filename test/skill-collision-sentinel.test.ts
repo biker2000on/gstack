@@ -66,10 +66,9 @@ const KNOWN_BUILTINS: Record<string, string[]> = {
     'stats',          // Session stats
     'usage',          // API usage stats
   ],
-  // Add codex/kiro/opencode/slate/cursor/openclaw/hermes/factory/gbrain
-  // built-in lists when we encounter collisions. Claude Code is the primary
-  // shadow risk because it's the biggest audience and ships the most
-  // frequently; other hosts collide less often.
+  // Add Codex/Gemini/Kiro/OpenCode/Slate/Cursor/Factory built-in lists when
+  // we encounter collisions. Mandatory gstack-* namespacing is the primary
+  // collision defense across hosts.
   // TODO: codex CLI built-ins (login, logout, exec, review, etc. — but we
   // invoke codex from gstack, we don't install skills INTO codex the same
   // way, so this is lower priority).

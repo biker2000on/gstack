@@ -123,7 +123,7 @@ export const SKILL_COVERAGE: Record<string, SkillCoverage> = {
   },
   'office-hours': {
     gate: ['test/skill-e2e-office-hours.test.ts', 'test/skill-coverage-floor.test.ts'],
-    periodic: ['test/skill-e2e-office-hours-auto-mode.test.ts', 'test/skill-e2e-office-hours-phase4.test.ts'],
+    periodic: ['test/skill-e2e-office-hours-auto-mode.test.ts'],
   },
 
   // ─── Polish + design ────────────────────────────────────────
@@ -159,32 +159,12 @@ export const SKILL_COVERAGE: Record<string, SkillCoverage> = {
   'context-restore': { gate: ['test/skill-e2e-context-skills.test.ts', 'test/skill-coverage-floor.test.ts'], periodic: [] },
   'setup-deploy': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
   'setup-browser-cookies': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
-  'setup-gbrain': {
-    gate: [
-      'test/skill-e2e-setup-gbrain-bad-token.test.ts',
-      'test/skill-e2e-setup-gbrain-path4-local-pglite.test.ts',
-      'test/skill-e2e-setup-gbrain-remote.test.ts',
-      'test/skill-coverage-floor.test.ts',
-    ],
-    periodic: [],
-  },
-  'sync-gbrain': {
-    gate: ['test/skill-coverage-floor.test.ts'],
-    periodic: ['test/regression-1611-gbrain-sync-resume.test.ts'],
-  },
   'open-gstack-browser': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
   'pair-agent': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
   scrape: { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
   skillify: { gate: ['test/skill-e2e-skillify.test.ts', 'test/skill-coverage-floor.test.ts'], periodic: [] },
   learn: { gate: ['test/skill-e2e-learnings.test.ts', 'test/skill-coverage-floor.test.ts'], periodic: [] },
   'plan-tune': { gate: ['test/skill-e2e-plan-tune.test.ts', 'test/skill-coverage-floor.test.ts'], periodic: [] },
-
-  // ─── iOS family ─────────────────────────────────────────────
-  'ios-qa': { gate: ['test/skill-e2e-ios.test.ts', 'test/skill-coverage-floor.test.ts'], periodic: ['test/skill-e2e-ios-device.test.ts', 'test/skill-e2e-ios-swift-build.test.ts'] },
-  'ios-fix': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
-  'ios-clean': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
-  'ios-sync': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
-  'ios-design-review': { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },
 
   // ─── Safety / housekeeping ──────────────────────────────────
   careful: { gate: ['test/skill-coverage-floor.test.ts'], periodic: [] },

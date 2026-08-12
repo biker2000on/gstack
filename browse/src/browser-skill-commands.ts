@@ -240,7 +240,7 @@ export interface SpawnSkillResult {
  * 1. Mint a scoped token (read+write only; expires at timeout + 30s slack).
  * 2. Build the env: trusted=true → process.env; trusted=false → scrubbed.
  *    GSTACK_PORT and GSTACK_SKILL_TOKEN are always set.
- * 3. Spawn `bun run script.ts -- <args>` with cwd=skill.dir.
+ * 3. Spawn the current Bun runtime with `run script.ts -- <args>`.
  * 4. Capture stdout (capped at 1MB) and stderr; enforce timeout.
  * 5. On exit/timeout, revoke the token. Always.
  */
@@ -263,7 +263,7 @@ export async function spawnSkill(opts: SpawnSkillOptions): Promise<SpawnSkillRes
       throw new Error(`Skill "${opts.skill.name}" missing script.ts at ${scriptPath}`);
     }
 
-    const proc = Bun.spawn(['bun', 'run', scriptPath, '--', ...opts.skillArgs], {
+    const proc = Bun.spawn([process.execPath, 'run', scriptPath, '--', ...opts.skillArgs], {
       cwd: opts.skill.dir,
       env,
       stdout: 'pipe',
@@ -371,8 +371,9 @@ export function buildSpawnEnv(opts: BuildEnvOptions): Record<string, string> {
       if (k === 'GSTACK_TOKEN') continue; // never propagate root token
       out[k] = v;
     }
-    // Set a minimal PATH if missing.
-    if (!out.PATH) out.PATH = '/usr/local/bin:/usr/bin:/bin';
+    // Windows commonly exposes this key as `Path`; normalize it for Bun's
+    // child-process lookup while preserving the trusted environment.
+    if (!out.PATH) out.PATH = process.env.Path ?? process.env.path ?? resolveMinimalPath();
   } else {
     // Untrusted: minimal allowlist.
     for (const k of UNTRUSTED_ALLOWLIST) {
@@ -402,12 +403,14 @@ export function buildSpawnEnv(opts: BuildEnvOptions): Record<string, string> {
 }
 
 function resolveMinimalPath(): string {
-  // Prefer the directory bun lives in; fall back to standard system dirs.
-  const fallback = '/usr/local/bin:/usr/bin:/bin';
+  // Prefer the exact Bun runtime directory on every platform.
+  const fallback = process.platform === 'win32'
+    ? path.dirname(process.execPath)
+    : '/usr/local/bin:/usr/bin:/bin';
   const bunPath = process.execPath;
-  if (bunPath && bunPath.includes('/bun')) {
+  if (bunPath && /^bun(?:\.exe)?$/i.test(path.basename(bunPath))) {
     const dir = path.dirname(bunPath);
-    return `${dir}:${fallback}`;
+    return [...new Set([dir, ...fallback.split(path.delimiter)])].join(path.delimiter);
   }
   return fallback;
 }

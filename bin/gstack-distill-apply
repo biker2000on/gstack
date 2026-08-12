@@ -12,15 +12,8 @@
 # already approved (Codex #15 trust boundary). The skill template (/plan-tune
 # distill review section) handles the confirm UX.
 #
-# gbrain integration: when gbrain is configured, the skill template ALSO
-# invokes mcp__gbrain__put_page / extract_facts / add_tag in the same turn
-# (those are MCP tools, not CLI-callable). Pass --gbrain-published true to
-# mark the proposal as mirrored to gbrain. The local file always gets the
-# write so it's the durable source-of-truth even on machines without gbrain.
-#
 # Usage:
 #   gstack-distill-apply --proposal <N>                # apply Nth proposal
-#   gstack-distill-apply --proposal <N> --gbrain-published true
 #   gstack-distill-apply --list                        # show pending proposals
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -34,12 +27,10 @@ PROFILE_FILE="$GSTACK_HOME/developer-profile.json"
 
 ACTION="apply"
 PROPOSAL_IDX=""
-GBRAIN_PUBLISHED="false"
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --proposal) PROPOSAL_IDX="$2"; shift 2 ;;
-    --gbrain-published) GBRAIN_PUBLISHED="$2"; shift 2 ;;
     --list) ACTION="list"; shift ;;
     --help|-h)
       sed -n '1,/^set -euo/p' "$0" | sed 's|^# \?||'
@@ -97,7 +88,6 @@ PROPOSAL_FILE_PATH="$PROPOSAL_FILE" \
 MEMORY_FILE_PATH="$MEMORY_FILE" \
 PROFILE_FILE_PATH="$PROFILE_FILE" \
 PREF_BIN="$SCRIPT_DIR/gstack-question-preference" \
-GBRAIN_PUBLISHED="$GBRAIN_PUBLISHED" \
 bun -e '
   const fs = require("fs");
   const { spawnSync } = require("child_process");
@@ -112,9 +102,7 @@ bun -e '
 
   const stamp = new Date().toISOString();
 
-  // Memory-nugget: always write to local file (durable source-of-truth even
-  // when gbrain is configured — gbrain is mirror, file is canon for the
-  // PreToolUse hook injection path in Layer 8).
+  // Memory nuggets stay in the local durable file used by the preference hook.
   if (pr.kind === "memory-nugget") {
     const memPath = process.env.MEMORY_FILE_PATH;
     let mem = { nuggets: [] };
@@ -124,7 +112,6 @@ bun -e '
       nugget: pr.nugget,
       applies_to_signal_keys: pr.applies_to_signal_keys || [],
       applied_at: stamp,
-      gbrain_published: process.env.GBRAIN_PUBLISHED === "true",
       source_quotes: pr.source_quotes || [],
     });
     const tmp = memPath + ".tmp";
@@ -174,7 +161,6 @@ bun -e '
 
   // Mark the proposal as applied so /plan-tune list shows it consumed.
   pr.applied_at = stamp;
-  pr.gbrain_published = process.env.GBRAIN_PUBLISHED === "true";
   const tmp = process.env.PROPOSAL_FILE_PATH + ".tmp";
   fs.writeFileSync(tmp, JSON.stringify(p, null, 2));
   fs.renameSync(tmp, process.env.PROPOSAL_FILE_PATH);

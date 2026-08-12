@@ -43,7 +43,7 @@ const factory: HostConfig = {
     'use the Glob tool': 'find files matching',
   },
 
-  suppressedResolvers: ['GBRAIN_CONTEXT_LOAD', 'GBRAIN_SAVE_RESULTS'],
+  suppressedResolvers: [],
 
   runtimeRoot: {
     globalSymlinks: ['bin', 'browse/dist', 'browse/bin', 'gstack-upgrade', 'ETHOS.md'],

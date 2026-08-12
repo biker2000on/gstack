@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, beforeAll, afterAll } from 'bun:test';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import * as crypto from 'crypto';
 import {
   buildFetchHandler,
@@ -217,8 +218,7 @@ describe('buildFetchHandler ownsTerminalAgent gate', () => {
     // Resolves browse/src/server.ts relative to this test file so the test
     // works regardless of cwd. import.meta.url is the test file's URL.
     const serverTsPath = path.resolve(
-      new URL(import.meta.url).pathname,
-      '..',
+      path.dirname(fileURLToPath(import.meta.url)),
       '..',
       'src',
       'server.ts',

@@ -5,17 +5,12 @@
  * Usage:
  *   gstack-decision-search [--query KW] [--scope repo|branch|issue]
  *                          [--branch B] [--issue I] [--recent N] [--all] [--json]
- *                          [--semantic]
  *
  * Reads the BOUNDED active snapshot (decisions.active.json) — O(active), not a full
  * history scan — and rebuilds it from the event log if missing. Scope-filtered to the
  * current branch/issue context (recency != relevance). NON-INTERACTIVE. `--all` shows
  * superseded decisions too (from the full log). Exit 0 silently when there are none.
  *
- * `--semantic` (with `--query`) appends an OPTIONAL "related from memory" block from
- * gbrain semantic recall. It is a pure enhancement: when gbrain is off/unconfigured/
- * empty it degrades silently to the reliable file results above. The reliable path
- * never loads gbrain code (the semantic module is imported lazily only here).
  */
 
 import { existsSync } from "fs";
@@ -44,7 +39,6 @@ const recentRaw = flagValue(args, "--recent");
 const recent = recentRaw ? parseInt(recentRaw, 10) : undefined;
 const showAll = args.includes("--all");
 const asJson = args.includes("--json");
-const semantic = args.includes("--semantic");
 
 let rows: ActiveDecision[];
 if (showAll) {
@@ -75,7 +69,7 @@ rows.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0)); // newest
 if (recent && recent > 0) rows = rows.slice(0, recent);
 
 if (asJson) {
-  // --json stays reliable-only (semantic recall is a human-facing supplement).
+  // JSON output uses the same bounded local decision store.
   console.log(JSON.stringify(rows));
   process.exit(0);
 }
@@ -88,21 +82,4 @@ for (const d of rows) {
   const scopeTag = d.scope === "repo" ? "" : ` [${d.scope}${branchTag}${issueTag}]`;
   console.log(`- ${datamark(d.decision ?? "")}${scopeTag} (${d.source}, ${d.date.slice(0, 10)})`);
   if (d.rationale) console.log(`  why: ${datamark(d.rationale)}`);
-}
-
-// OPTIONAL gbrain enhancement. Lazy import so the reliable path above never loads
-// gbrain code. Degrades silently: null (gbrain off) or [] (nothing found) leaves the
-// reliable results above as the answer.
-if (semantic && queryRaw) {
-  const { semanticRecall } = await import("../lib/gstack-decision-semantic");
-  const hits = semanticRecall(queryRaw);
-  if (hits && hits.length) {
-    console.log("\nRelated from memory (gbrain semantic recall):");
-    for (const h of hits) {
-      // gbrain hits are EXTERNAL corpus content — datamark slug + snippet too so they
-      // can't spoof role markers / fences when printed into agent context.
-      const snip = datamark(h.snippet.length > 100 ? `${h.snippet.slice(0, 100)}…` : h.snippet);
-      console.log(`  [${h.score.toFixed(2)}] ${datamark(h.slug)}: ${snip}`);
-    }
-  }
 }

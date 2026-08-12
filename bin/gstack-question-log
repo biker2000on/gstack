@@ -241,6 +241,6 @@ if [ -z "${GSTACK_QUESTION_LOG_NO_DERIVE:-}" ]; then
   ) >/dev/null 2>&1
 fi
 
-# NOTE: question-log.jsonl is deliberately NOT enqueued for gbrain-sync.
+# NOTE: question-log.jsonl remains local and is never uploaded.
 # Per Codex v2 review, audit/derivation data stays local alongside the
 # question-preferences.json it annotates.

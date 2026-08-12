@@ -567,15 +567,11 @@ invokes via `/plan-tune distill` / `dream`.
    - The source quotes verbatim (proves user-origin)
    - What applying does (which file/key/dim changes)
 
-3. **On accept** (Y): apply via the bin. The skill also publishes the
-   nugget to gbrain when configured.
+3. **On accept** (Y): apply via the local bin.
 
    For `memory-nugget`:
    ```bash
-   # If gbrain is configured, mirror via MCP first.
-   # (Pseudo — actual gbrain call happens at the agent layer via
-   # mcp__gbrain__put_page; the bin records the published flag.)
-   ~/.claude/skills/gstack/bin/gstack-distill-apply --proposal N --gbrain-published true|false
+   ~/.claude/skills/gstack/bin/gstack-distill-apply --proposal N
    ```
 
    For `preference`:
@@ -594,16 +590,6 @@ invokes via `/plan-tune distill` / `dream`.
    proposal stays in the file). To dismiss permanently, manually clear:
    `gstack-distill-apply --proposal N --dismiss` (not implemented in T11;
    for now, regenerate via next distill run with corrected free-text).
-
-5. **gbrain integration.** When `mcp__gbrain__*` tools are available in
-   this session:
-   - On `memory-nugget` apply: `mcp__gbrain__put_page` with the nugget +
-     `mcp__gbrain__extract_facts` + `mcp__gbrain__add_tag` per the cathedral
-     plan D9 routing. Then pass `--gbrain-published true` to the bin so
-     the proposals file records the mirror.
-   - When gbrain isn't configured (no MCP tools), the bin's local file
-     write is the durable source-of-truth and the PreToolUse hook reads it
-     via Layer 8 memory injection.
 
 ---
 

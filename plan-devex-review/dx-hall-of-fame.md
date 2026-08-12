@@ -8,7 +8,7 @@ Read ONLY the section for the current review pass. Do NOT load the entire file.
 - **Stripe**: 7 lines of code to charge a card. Docs pre-fill YOUR test API keys when logged in. Stripe Shell runs CLI inside docs page. No local install needed.
 - **Vercel**: `git push` = live site on global CDN with HTTPS. Every PR gets preview URL. One CLI command: `vercel`.
 - **Clerk**: `<SignIn />`, `<SignUp />`, `<UserButton />`. 3 JSX components, working auth with email, social, MFA out of the box.
-- **Supabase**: Create a Postgres table, auto-generates REST API + Realtime + self-documenting docs instantly.
+- **Stripe**: Add a checkout flow with a small API surface, clear test mode, and self-documenting examples.
 - **Firebase**: `onSnapshot()`. 3 lines for real-time sync across all clients with offline persistence built-in.
 - **Twilio**: Virtual Phone in console. Send/receive SMS without buying a number, no credit card. Result: 62% improvement in activation.
 
@@ -28,7 +28,7 @@ Read ONLY the section for the current review pass. Do NOT load the entire file.
 - **Stripe idempotency keys**: Pass `Idempotency-Key` header on mutations. Safe retries. No "did I double-charge?" anxiety.
 - **Stripe API versioning**: First call pins account to that day's version. Test new versions per-request via `Stripe-Version` header.
 - **GitHub CLI**: Auto-detects terminal vs pipe. Human-readable in terminal, tab-delimited when piped. `gh pr <tab>` shows all PR actions.
-- **SwiftUI progressive disclosure**: `Button("Save") { save() }` to full customization, same API at every level.
+- **React progressive disclosure**: start with a simple component, then add composition and customization without changing the core API.
 - **htmx**: HTML attributes replace JS. 14KB total. `hx-get="/search" hx-trigger="keyup changed delay:300ms"`. Zero build step.
 - **shadcn/ui**: Copy source code into your project. You own every line. No dependency, no version conflicts.
 

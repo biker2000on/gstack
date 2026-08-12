@@ -19,8 +19,8 @@ CACHE_FILE="$STATE_DIR/last-update-check"
 MARKER_FILE="$STATE_DIR/just-upgraded-from"
 SNOOZE_FILE="$STATE_DIR/update-snoozed"
 VERSION_FILE="$GSTACK_DIR/VERSION"
-REMOTE_URL="${GSTACK_REMOTE_URL:-https://raw.githubusercontent.com/garrytan/gstack/main/VERSION}"
-REMOTE_REPO="${GSTACK_REMOTE_REPO:-https://github.com/garrytan/gstack.git}"
+REMOTE_URL="${GSTACK_REMOTE_URL:-https://raw.githubusercontent.com/biker2000on/gstack/main/VERSION}"
+REMOTE_REPO="${GSTACK_REMOTE_REPO:-https://github.com/biker2000on/gstack.git}"
 
 # ─── Force flag (busts cache + snooze for standalone /gstack-upgrade) ──
 if [ "${1:-}" = "--force" ]; then
@@ -160,26 +160,6 @@ fi
 # ─── Step 4: Slow path — fetch remote version ────────────────
 mkdir -p "$STATE_DIR"
 
-# Fire Supabase install ping in background (parallel, non-blocking)
-# This logs an update check event for community health metrics via edge function.
-# If Supabase is not configured or telemetry is off, this is a no-op.
-if [ -z "${GSTACK_SUPABASE_URL:-}" ] && [ -f "$GSTACK_DIR/supabase/config.sh" ]; then
-  . "$GSTACK_DIR/supabase/config.sh"
-fi
-_SUPA_URL="${GSTACK_SUPABASE_URL:-}"
-_SUPA_KEY="${GSTACK_SUPABASE_ANON_KEY:-}"
-# Respect telemetry opt-out — don't ping Supabase if user set telemetry: off
-_TEL_TIER="$("$GSTACK_DIR/bin/gstack-config" get telemetry 2>/dev/null || true)"
-if [ -n "$_SUPA_URL" ] && [ -n "$_SUPA_KEY" ] && [ "${_TEL_TIER:-off}" != "off" ]; then
-  _OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-  curl -sf --max-time 5 \
-    -X POST "${_SUPA_URL}/functions/v1/update-check" \
-    -H "Content-Type: application/json" \
-    -H "apikey: ${_SUPA_KEY}" \
-    -d "{\"version\":\"$LOCAL\",\"os\":\"$_OS\"}" \
-    >/dev/null 2>&1 &
-fi
-
 # Resolve VERSION via a SHA-pinned raw URL. GitHub's branch-raw CDN
 # (raw.githubusercontent.com/<owner>/<repo>/<branch>/...) can serve stale
 # content for several minutes after a push, which previously caused
@@ -197,7 +177,7 @@ if [ -z "${GSTACK_REMOTE_URL:-}" ]; then
     git ls-remote "$REMOTE_REPO" refs/heads/main 2>/dev/null || true)"
   _REMOTE_SHA="$(echo "$_LSR_LINE" | awk '{print $1}')"
   if echo "$_REMOTE_SHA" | grep -qE '^[0-9a-f]{40}$'; then
-    _SHA_URL="https://raw.githubusercontent.com/garrytan/gstack/${_REMOTE_SHA}/VERSION"
+    _SHA_URL="https://raw.githubusercontent.com/biker2000on/gstack/${_REMOTE_SHA}/VERSION"
     REMOTE="$(curl -sf --max-time 5 "$_SHA_URL" 2>/dev/null || true)"
   fi
 fi

@@ -11,7 +11,7 @@
 #
 # Enum tokens (the ONLY strings this ever emits):
 #   greenfield | code_node | code_python | code_rust | code_go | code_ruby
-#   | code_ios | branch_ahead | dirty_default | clean_default | nongit
+#   | branch_ahead | dirty_default | clean_default | nongit
 #
 # The caller maps the token to human prose; no description text crosses the
 # eval boundary. Usage: TOKEN=$(gstack-first-task-detect)
@@ -31,7 +31,7 @@ _git() {
 # below is a literal.
 _emit() {
   case "$1" in
-    greenfield|code_node|code_python|code_rust|code_go|code_ruby|code_ios|branch_ahead|dirty_default|clean_default|nongit)
+    greenfield|code_node|code_python|code_rust|code_go|code_ruby|branch_ahead|dirty_default|clean_default|nongit)
       printf '%s\n' "$1" ;;
     *) : ;;  # unknown → emit nothing (caller shows no scaffold)
   esac
@@ -94,7 +94,6 @@ if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f requirements.txt ]; then _em
 if [ -f Cargo.toml ]; then _emit code_rust; fi
 if [ -f go.mod ]; then _emit code_go; fi
 if [ -f Gemfile ]; then _emit code_ruby; fi
-if ls ./*.xcodeproj >/dev/null 2>&1 || [ -d ios ]; then _emit code_ios; fi
 
 # --- 7. Clean default branch with history, no recognized language → pick something ---
 if [ "$_commits" -ge 5 ] 2>/dev/null; then

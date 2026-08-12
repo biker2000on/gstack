@@ -15,7 +15,7 @@ const DETECT = path.join(ROOT, 'bin', 'gstack-first-task-detect');
 // guarantee is that nothing outside this set ever reaches the preamble.
 const ENUM = new Set([
   'greenfield', 'code_node', 'code_python', 'code_rust', 'code_go',
-  'code_ruby', 'code_ios', 'branch_ahead', 'dirty_default', 'clean_default', 'nongit',
+  'code_ruby', 'branch_ahead', 'dirty_default', 'clean_default', 'nongit',
 ]);
 
 const GIT_ENV = {
@@ -79,14 +79,6 @@ describe('gstack-first-task-detect — bucket classification', () => {
       expect(detect(d)).toBe(token);
     });
   }
-
-  test('iOS project (.xcodeproj) with a commit → code_ios', () => {
-    const d = freshRepo('ios');
-    fs.mkdirSync(path.join(d, 'App.xcodeproj'));
-    fs.writeFileSync(path.join(d, 'App.xcodeproj', 'project.pbxproj'), '// x');
-    git(d, 'add -A'); git(d, 'commit -qm init');
-    expect(detect(d)).toBe('code_ios');
-  });
 
   // Precedence (the detector's most fragile logic): branch-state buckets must
   // win over language markers, so a real repo isn't mislabeled "verify tests".

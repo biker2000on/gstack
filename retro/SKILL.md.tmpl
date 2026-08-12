@@ -18,25 +18,6 @@ triggers:
   - weekly retro
   - what did we ship
   - engineering retrospective
-gbrain:
-  schema: 1
-  context_queries:
-    - id: prior-retros
-      kind: filesystem
-      glob: "~/.gstack/projects/{repo_slug}/retros/*.md"
-      sort: mtime_desc
-      limit: 5
-      render_as: "## Prior retros for this project"
-    - id: recent-timeline
-      kind: filesystem
-      glob: "~/.gstack/projects/{repo_slug}/timeline.jsonl"
-      tail: 30
-      render_as: "## Recent timeline events"
-    - id: recent-learnings
-      kind: filesystem
-      glob: "~/.gstack/projects/{repo_slug}/learnings.jsonl"
-      tail: 10
-      render_as: "## Recent learnings"
 ---
 
 {{PREAMBLE}}
@@ -60,7 +41,6 @@ When the user types `/retro`, run this skill.
 - `/retro global` — cross-project retro across all AI coding tools (7d default)
 - `/retro global 14d` — cross-project retro with explicit window
 
-{{GBRAIN_CONTEXT_LOAD}}
 
 ## Instructions
 
@@ -382,7 +362,6 @@ For each contributor (including the current user), compute:
 
 {{LEARNINGS_LOG}}
 
-{{GBRAIN_SAVE_RESULTS}}
 
 ### Step 10: Week-over-Week Trends (if window >= 14d)
 

@@ -51,7 +51,8 @@ export function condenseOpenAIShortDescription(description: string): string {
   return `${safe}...`;
 }
 
-export function generateOpenAIYaml(displayName: string, shortDescription: string): string {
+export function generateOpenAIYaml(skillName: string, shortDescription: string): string {
+  const displayName = `gstack: ${skillName.replace(/^gstack-/, '')}`;
   return `interface:
   display_name: ${JSON.stringify(displayName)}
   short_description: ${JSON.stringify(shortDescription)}

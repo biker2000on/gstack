@@ -1,5 +1,17 @@
 # Changelog
 
+## biker workflow edition - 2026-08-12
+
+- Added equal first-class generation and installation for Claude Code, OpenAI
+  Codex, and Gemini CLI.
+- Made `gstack-<skill>` identifiers mandatory and added `gstack: <skill>` host
+  display labels where metadata supports them.
+- Removed the mobile-platform suite, external memory services, retired agent
+  adapters, and hosted backend infrastructure from the active distribution.
+- Reworked setup and `gstack-upgrade` to follow `biker2000on/gstack` safely with
+  fast-forward-only updates.
+- Added a Windows-safe regression command and cross-machine bootstrap installer.
+
 ## [1.62.0.0] - 2026-08-12
 
 ## **Plan reviews stop asking what to review when you're in plan mode.**
