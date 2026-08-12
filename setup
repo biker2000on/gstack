@@ -1037,7 +1037,17 @@ if [ "$INSTALL_CLAUDE" -eq 1 ]; then
     if [ -d "$CLAUDE_GSTACK_LINK" ] && [ ! -L "$CLAUDE_GSTACK_LINK" ]; then
       _EXISTING_REAL=$(cd "$CLAUDE_GSTACK_LINK" 2>/dev/null && pwd -P || echo "")
       if [ -n "$_EXISTING_REAL" ] && [ "$_EXISTING_REAL" != "$SOURCE_GSTACK_DIR" ]; then
-        _SKIP_CLAUDE_REGISTER=1
+        _ALLOW_WINDOWS_REFRESH=0
+        if [ "$IS_WINDOWS" -eq 1 ] && [ "${GSTACK_ALLOW_WINDOWS_REFRESH:-0}" = "1" ]; then
+          _EXISTING_ORIGIN=$(git -C "$CLAUDE_GSTACK_LINK" remote get-url origin 2>/dev/null || true)
+          _SOURCE_ORIGIN=$(git -C "$SOURCE_GSTACK_DIR" remote get-url origin 2>/dev/null || true)
+          _EXISTING_DIRTY=$(git -C "$CLAUDE_GSTACK_LINK" status --porcelain 2>/dev/null || echo "unknown")
+          if [ -n "$_EXISTING_ORIGIN" ] && [ "$_EXISTING_ORIGIN" = "$_SOURCE_ORIGIN" ] && [ -z "$_EXISTING_DIRTY" ]; then
+            _ALLOW_WINDOWS_REFRESH=1
+            log "  refreshing clean Windows Claude copy from $SOURCE_GSTACK_DIR"
+          fi
+        fi
+        [ "$_ALLOW_WINDOWS_REFRESH" -eq 1 ] || _SKIP_CLAUDE_REGISTER=1
       fi
     fi
 

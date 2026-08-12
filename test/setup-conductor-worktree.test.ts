@@ -25,6 +25,16 @@ describe('setup: Conductor worktree guard', () => {
     expect(content).toContain('"$_EXISTING_REAL" != "$SOURCE_GSTACK_DIR"');
   });
 
+  test('Windows bootstrap may refresh only a clean copy from the same origin', () => {
+    const content = fs.readFileSync(SETUP_SCRIPT, 'utf-8');
+    expect(content).toContain('${GSTACK_ALLOW_WINDOWS_REFRESH:-0}');
+    expect(content).toContain('git -C "$CLAUDE_GSTACK_LINK" remote get-url origin');
+    expect(content).toContain('git -C "$SOURCE_GSTACK_DIR" remote get-url origin');
+    expect(content).toContain('git -C "$CLAUDE_GSTACK_LINK" status --porcelain');
+    expect(content).toContain('[ "$_EXISTING_ORIGIN" = "$_SOURCE_ORIGIN" ]');
+    expect(content).toContain('[ -z "$_EXISTING_DIRTY" ]');
+  });
+
   test('skip branch prints "registration skipped" + remediation hint', () => {
     const content = fs.readFileSync(SETUP_SCRIPT, 'utf-8');
     expect(content).toContain('Skipping Claude skill registration');
