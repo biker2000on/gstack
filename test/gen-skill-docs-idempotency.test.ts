@@ -35,7 +35,7 @@ const STABLE_OUTPUTS = [
 
 /**
  * Sampled outputs from EVERY non-Claude host. The full host-all run touches
- * .agents/, .gemini/, .cursor/, .factory/, .kiro/, .opencode/, and .slate/
+ * .agents/, .gemini/, .polly/, .cursor/, .factory/, .kiro/, .opencode/, and .slate/
  * — picking one canonical file per host catches per-host
  * non-determinism without paying the cost of snapshotting hundreds of files.
  */
@@ -47,6 +47,7 @@ const STABLE_HOST_ALL_OUTPUTS = [
   '.cursor/skills/gstack-ship/SKILL.md',
   '.factory/skills/gstack-ship/SKILL.md',
   '.gemini/skills/gstack-ship/SKILL.md',
+  '.polly/skills/gstack-ship/SKILL.md',
 ];
 
 function runGen(extraArgs: string[] = []): { exitCode: number; stderr: string } {

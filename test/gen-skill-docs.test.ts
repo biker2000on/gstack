@@ -2369,9 +2369,9 @@ describe('setup script validation', () => {
     expect(claudeSection).toContain('link_claude_root_skill_alias "$SOURCE_GSTACK_DIR" "$INSTALL_SKILLS_DIR"');
   });
 
-  test('setup supports --host auto|claude|codex|kiro|opencode', () => {
+  test('setup supports all selectable hosts, including Polly', () => {
     expect(setupContent).toContain('--host');
-    expect(setupContent).toContain('claude|codex|kiro|factory|opencode|auto');
+    expect(setupContent).toContain('claude|codex|gemini|polly|kiro|factory|opencode|auto');
   });
 
   test('auto mode detects claude, codex, kiro, and opencode binaries', () => {
@@ -3059,7 +3059,7 @@ describe('plan-mode-info resolver (handshake-replacement)', () => {
     // Non-Claude hosts render to hostSubdirs (.agents/, .gemini/, etc). The
     // plan-mode-info resolver has no host-scoping — all hosts get the new
     // section, none get the old handshake. Scan all candidate host dirs.
-    const hostDirs = ['.agents', '.gemini', '.opencode', '.factory', '.kiro', '.cursor', '.slate'];
+    const hostDirs = ['.agents', '.gemini', '.polly', '.opencode', '.factory', '.kiro', '.cursor', '.slate'];
     let checked = 0;
     for (const host of hostDirs) {
       const skillsRoot = path.join(ROOT, host, 'skills');

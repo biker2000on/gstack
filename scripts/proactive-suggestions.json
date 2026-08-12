@@ -105,7 +105,7 @@
     },
     "gstack-upgrade": {
       "lead": "Upgrade the customized gstack installation from biker2000on/gstack.",
-      "routing": "Detects\nClaude, Codex, Gemini, shared-repo, and vendored installs, preserves local\nchanges, rebuilds all host formats, and summarizes user-facing changes.",
+      "routing": "Detects\nClaude, Codex, Gemini, Omnigent Polly, shared-repo, and vendored installs,\npreserves local changes, rebuilds all detected host formats, and summarizes\nuser-facing changes.",
       "voice_line": null
     },
     "guard": {

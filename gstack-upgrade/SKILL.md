@@ -18,8 +18,9 @@ allowed-tools:
 ## When to invoke this skill
 
 Detects
-Claude, Codex, Gemini, shared-repo, and vendored installs, preserves local
-changes, rebuilds all host formats, and summarizes user-facing changes.
+Claude, Codex, Gemini, Omnigent Polly, shared-repo, and vendored installs,
+preserves local changes, rebuilds all detected host formats, and summarizes
+user-facing changes.
 
 # gstack: upgrade
 
@@ -31,12 +32,20 @@ features intentionally removed from this fork.
 
 ```bash
 INSTALL_DIR=""
+RUNTIME_CHECKOUT=""
+if [ -n "${GSTACK_ROOT:-}" ] && [ -e "$GSTACK_ROOT/bin" ]; then
+  _RUNTIME_BIN=$(readlink -f "$GSTACK_ROOT/bin" 2>/dev/null || true)
+  [ -n "$_RUNTIME_BIN" ] && RUNTIME_CHECKOUT=$(dirname "$_RUNTIME_BIN")
+fi
 for candidate in \
+  "$RUNTIME_CHECKOUT" \
   "${GSTACK_ROOT:-}" \
+  "$HOME/projects/gstack" \
   "$HOME/.gstack/repos/gstack" \
   "$HOME/.claude/skills/gstack" \
   "$HOME/.codex/skills/gstack" \
-  "$HOME/.gemini/skills/gstack"; do
+  "$HOME/.gemini/skills/gstack" \
+  "$HOME/.omnigent/skills/gstack"; do
   [ -n "$candidate" ] && [ -d "$candidate/.git" ] && INSTALL_DIR="$candidate" && break
 done
 
@@ -91,8 +100,10 @@ If the fast-forward fails, report the divergence and stop. Never use
 ## 4. Report changes
 
 Read `CHANGELOG.md` entries between the old and new versions and summarize at
-most seven user-facing changes. Mention that Claude, Codex, and Gemini formats
-were regenerated and that all skills remain namespaced as `gstack-*`.
+most seven user-facing changes. Mention that every locally detected host format
+(Claude, Codex, Gemini, and Polly) was regenerated and that all skills remain
+namespaced as `gstack-*`. `./setup --host auto` updates all detected hosts on
+this machine in one run; it is not limited to the harness that invoked upgrade.
 
 If the versions match, report that the installation is already current.
 

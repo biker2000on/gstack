@@ -1,7 +1,7 @@
 # gstack — biker2000on workflow edition
 
 This fork packages gstack as a portable, namespaced skill suite for Claude Code,
-OpenAI Codex, and Gemini CLI. It keeps the planning, review, browser, QA, release,
+OpenAI Codex, Gemini CLI, and Omnigent Polly. It keeps the planning, review, browser, QA, release,
 documentation, and safety workflows while removing iOS, gbrain, OpenClaw, Hermes,
 and Supabase-specific components.
 
@@ -20,10 +20,15 @@ skill collections.
 | Claude Code | `./setup --host claude` | `~/.claude/skills/gstack-*` |
 | OpenAI Codex | `./setup --host codex` | `~/.codex/skills/gstack-*` |
 | Gemini CLI (`agy`) | `./setup --host gemini` | `~/.gemini/skills/gstack-*` |
+| Omnigent Polly | `./setup --host polly` | Polly's active bundled `skills/gstack-*` directory |
 
 Running `./setup` with no host flag auto-detects installed agents and installs to
 each detected host. If none is detected, it produces the shared external-agent
 format rather than assuming Claude.
+
+Polly's bundled path is managed by Omnigent and can change after `omni upgrade`.
+Setup rediscovers it on every run; rerun `./setup --host polly` after upgrading
+Omnigent to restore the skill links while leaving Polly's built-in skills intact.
 
 ## Install
 

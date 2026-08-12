@@ -17,6 +17,7 @@ import {
   claude,
   codex,
   gemini,
+  polly,
   factory,
   kiro,
   opencode,
@@ -32,8 +33,8 @@ const RESOLVER_NAMES = new Set(Object.keys(RESOLVERS));
 // ─── hosts/index.ts ─────────────────────────────────────────
 
 describe('hosts/index.ts', () => {
-  test('ALL_HOST_CONFIGS has 8 hosts', () => {
-    expect(ALL_HOST_CONFIGS.length).toBe(8);
+  test('ALL_HOST_CONFIGS has 9 hosts', () => {
+    expect(ALL_HOST_CONFIGS.length).toBe(9);
   });
 
   test('ALL_HOST_NAMES matches config names', () => {
@@ -50,6 +51,7 @@ describe('hosts/index.ts', () => {
     expect(claude.name).toBe('claude');
     expect(codex.name).toBe('codex');
     expect(gemini.name).toBe('gemini');
+    expect(polly.name).toBe('polly');
     expect(factory.name).toBe('factory');
     expect(kiro.name).toBe('kiro');
     expect(opencode.name).toBe('opencode');
