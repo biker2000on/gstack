@@ -5,9 +5,9 @@ import type { HostConfig } from '../scripts/host-config';
 // side-by-side without symlink ownership conflicts.
 const gemini: HostConfig = {
   name: 'gemini',
-  displayName: 'Google Gemini CLI',
-  cliCommand: 'gemini',
-  cliAliases: [],
+  displayName: 'Google Gemini CLI (agy)',
+  cliCommand: 'agy',
+  cliAliases: ['gemini'],
 
   globalRoot: '.gemini/skills/gstack',
   localSkillRoot: '.gemini/skills/gstack',

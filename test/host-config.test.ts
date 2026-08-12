@@ -512,6 +512,8 @@ describe('host config correctness', () => {
   });
 
   test('gemini uses native skill paths and portable names', () => {
+    expect(gemini.cliCommand).toBe('agy');
+    expect(gemini.cliAliases).toContain('gemini');
     expect(gemini.globalRoot).toBe('.gemini/skills/gstack');
     expect(gemini.hostSubdir).toBe('.gemini');
     expect(gemini.pathRewrites.some(r => r.from === 'CLAUDE.md' && r.to === 'AGENTS.md')).toBe(true);

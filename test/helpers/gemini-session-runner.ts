@@ -107,11 +107,11 @@ export async function runGeminiSkill(opts: {
 
   const startTime = Date.now();
 
-  // Check if gemini binary exists
-  const whichResult = Bun.spawnSync(['which', 'gemini']);
-  if (whichResult.exitCode !== 0) {
+  // Prefer the current agy command while accepting the legacy gemini alias.
+  const geminiBin = Bun.which('agy') ?? Bun.which('gemini');
+  if (!geminiBin) {
     return {
-      output: 'SKIP: gemini binary not found',
+      output: 'SKIP: agy binary not found',
       toolCalls: [],
       tokens: 0,
       exitCode: -1,
@@ -129,7 +129,7 @@ export async function runGeminiSkill(opts: {
   // Spawn gemini — uses real HOME for auth (~/.gemini; HOME is allowlisted),
   // cwd for skill discovery. Hermetic scrub with gemini's auth surface
   // re-admitted (previously this spawn inherited the full operator env).
-  const proc = Bun.spawn(['gemini', ...args], {
+  const proc = Bun.spawn([geminiBin, ...args], {
     cwd: cwd || process.cwd(),
     stdout: 'pipe',
     stderr: 'pipe',

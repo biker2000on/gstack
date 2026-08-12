@@ -11,7 +11,7 @@
  * Source-of-truth references:
  *   - Claude Code: https://code.claude.com/docs/en/tools
  *   - Codex CLI: `codex exec --help` tool listing
- *   - Gemini CLI: `gemini --help` (limited tool surface as of 2026-04)
+ *   - Gemini CLI: `agy --help` (legacy command: `gemini`)
  */
 
 export type ToolName =

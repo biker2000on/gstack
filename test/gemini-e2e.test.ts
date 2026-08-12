@@ -7,7 +7,7 @@
  * .agents/skills/ discovery mechanism.
  *
  * Prerequisites:
- * - `gemini` binary installed (npm install -g @google/gemini-cli)
+ * - `agy` binary installed (`gemini` remains a compatibility alias)
  * - Gemini authenticated via ~/.gemini/ config or GEMINI_API_KEY env var
  * - EVALS=1 env var set (same gate as Claude E2E tests)
  *
@@ -26,12 +26,8 @@ const ROOT = path.resolve(import.meta.dir, '..');
 
 // --- Prerequisites check ---
 
-const GEMINI_AVAILABLE = (() => {
-  try {
-    const result = Bun.spawnSync(['which', 'gemini']);
-    return result.exitCode === 0;
-  } catch { return false; }
-})();
+const GEMINI_BIN = Bun.which('agy') ?? Bun.which('gemini');
+const GEMINI_AVAILABLE = GEMINI_BIN !== null;
 
 const evalsEnabled = !!process.env.EVALS;
 
@@ -44,7 +40,7 @@ const describeGemini = SKIP ? describe.skip : describe;
 if (!evalsEnabled) {
   // Silent — same as Claude E2E tests, EVALS=1 required
 } else if (!GEMINI_AVAILABLE) {
-  process.stderr.write('\nGemini E2E: SKIPPED — gemini binary not found (install: npm i -g @google/gemini-cli)\n');
+  process.stderr.write('\nGemini E2E: SKIPPED — agy binary not found (legacy gemini alias also checked)\n');
 }
 
 // --- Diff-based test selection ---

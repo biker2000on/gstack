@@ -19,7 +19,7 @@ skill collections.
 |---|---|---|
 | Claude Code | `./setup --host claude` | `~/.claude/skills/gstack-*` |
 | OpenAI Codex | `./setup --host codex` | `~/.codex/skills/gstack-*` |
-| Gemini CLI | `./setup --host gemini` | `~/.gemini/skills/gstack-*` |
+| Gemini CLI (`agy`) | `./setup --host gemini` | `~/.gemini/skills/gstack-*` |
 
 Running `./setup` with no host flag auto-detects installed agents and installs to
 each detected host. If none is detected, it produces the shared external-agent

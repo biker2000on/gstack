@@ -1,6 +1,6 @@
 import type { ProviderAdapter, RunOpts, RunResult, AvailabilityCheck } from './types';
 import { estimateCostUsd } from '../pricing';
-import { execFileSync, spawnSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -94,7 +94,7 @@ export function resultFromGeminiStream(
 }
 
 /**
- * Gemini adapter — wraps the `gemini` CLI.
+ * Gemini adapter — wraps the `agy` CLI (`gemini` is a compatibility alias).
  *
  * Auth: GEMINI_API_KEY / GOOGLE_API_KEY (preferred), or ~/.gemini oauth.
  *   Personal OAuth free-tier is no longer supported by gemini CLI — use an
@@ -113,9 +113,9 @@ export class GeminiAdapter implements ProviderAdapter {
   readonly family = 'gemini' as const;
 
   async available(): Promise<AvailabilityCheck> {
-    const res = spawnSync('sh', ['-c', 'command -v gemini'], { timeout: 2000 });
-    if (res.status !== 0) {
-      return { ok: false, reason: 'gemini CLI not found on PATH. Install per https://github.com/google-gemini/gemini-cli' };
+    const binary = Bun.which('agy') ?? Bun.which('gemini');
+    if (!binary) {
+      return { ok: false, reason: 'agy CLI not found on PATH (legacy gemini alias also checked)' };
     }
     const legacyCfgDir = path.join(os.homedir(), '.config', 'gemini');
     const newCfgDir = path.join(os.homedir(), '.gemini');
@@ -135,6 +135,10 @@ export class GeminiAdapter implements ProviderAdapter {
 
   async run(opts: RunOpts): Promise<RunResult> {
     const start = Date.now();
+    const binary = Bun.which('agy') ?? Bun.which('gemini');
+    if (!binary) {
+      return this.emptyResult(0, { code: 'unknown', reason: 'agy CLI not found on PATH' }, opts.model);
+    }
     // Default to --yolo (non-interactive) and stream-json output so we can parse
     // tokens + tool calls. --skip-trust is required for headless/temp workdirs
     // (gemini CLI otherwise exits: "not running in a trusted directory").
@@ -144,7 +148,7 @@ export class GeminiAdapter implements ProviderAdapter {
     if (opts.extraArgs) args.push(...opts.extraArgs);
 
     try {
-      const out = execFileSync('gemini', args, {
+      const out = execFileSync(binary, args, {
         cwd: opts.workdir,
         timeout: opts.timeoutMs,
         encoding: 'utf-8',
