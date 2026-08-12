@@ -5,12 +5,16 @@ umask 077  # Restrict new files to owner-only (0o600 files, 0o700 dirs)
 
 if ! command -v bun >/dev/null 2>&1; then
   echo "Error: bun is required but not installed." >&2
-  echo "Install with checksum verification:" >&2
-  echo '  BUN_VERSION="1.3.10"' >&2
-  echo '  tmpfile=$(mktemp)' >&2
-  echo '  curl -fsSL "https://bun.sh/install" -o "$tmpfile"' >&2
-  echo '  echo "Verify checksum before running: shasum -a 256 $tmpfile"' >&2
-  echo '  BUN_VERSION="$BUN_VERSION" bash "$tmpfile" && rm "$tmpfile"' >&2
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+      echo "Install Bun from PowerShell:" >&2
+      echo '  irm https://bun.sh/install.ps1 | iex' >&2
+      echo "The biker2000on/agent-skills Windows bootstrapper can also install it automatically." >&2
+      ;;
+    *)
+      echo "Install Bun from https://bun.sh/docs/installation and rerun setup." >&2
+      ;;
+  esac
   exit 1
 fi
 
