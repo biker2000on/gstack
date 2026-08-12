@@ -58,6 +58,12 @@ echo "INSTALL_DIR=$INSTALL_DIR"
 ```bash
 cd "$INSTALL_DIR"
 ORIGIN=$(git remote get-url origin 2>/dev/null || true)
+# Claude's symlink-based install intentionally prefixes name fields in generated
+# SKILL.md files. Restore their canonical generated form before deciding whether
+# the checkout contains user edits; template and code changes remain visible.
+if [ -x "$INSTALL_DIR/bin/gstack-patch-names" ]; then
+  "$INSTALL_DIR/bin/gstack-patch-names" "$INSTALL_DIR" false >/dev/null
+fi
 STATUS=$(git status --short)
 echo "ORIGIN=$ORIGIN"
 echo "$STATUS"
