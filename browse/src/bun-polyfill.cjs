@@ -75,6 +75,7 @@ globalThis.Bun = {
       timeout: options.timeout,
       env: options.env,
       cwd: options.cwd,
+      windowsHide: options.windowsHide !== false,
     });
 
     return {
@@ -91,6 +92,7 @@ globalThis.Bun = {
       stdio,
       env: options.env,
       cwd: options.cwd,
+      windowsHide: options.windowsHide !== false,
     });
 
     return {

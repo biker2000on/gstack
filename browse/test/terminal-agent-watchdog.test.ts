@@ -82,6 +82,22 @@ describe('terminal-agent watchdog (v1.44+)', () => {
     expect(cli).toContain('spawnTerminalAgent({');
     expect(cli).toContain("from './terminal-agent-control'");
   });
+
+  test('8. terminal-agent child is hidden on Windows', () => {
+    const src = fs.readFileSync(CONTROL_TS, 'utf-8');
+    const block = sliceBetween(src, "(Bun as any).spawn(['bun', 'run', script]", 'proc.unref');
+    expect(block).toContain('windowsHide: true');
+  });
+
+  test('9. CLI hides both Windows daemon-launch processes', () => {
+    const cli = fs.readFileSync(
+      path.resolve(TEST_DIR, '..', 'src', 'cli.ts'),
+      'utf-8',
+    );
+    const block = sliceBetween(cli, 'if (IS_WINDOWS)', '} else {');
+    expect(block.match(/windowsHide:true/g)?.length).toBe(1);
+    expect(block.match(/windowsHide: true/g)?.length).toBe(1);
+  });
 });
 
 function sliceBetween(source: string, start: string, end: string): string {

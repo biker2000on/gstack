@@ -55,8 +55,6 @@ export function resolveServerScript(
   );
 }
 
-const SERVER_SCRIPT = resolveServerScript();
-
 /**
  * On Windows, resolve the Node.js-compatible server bundle.
  * Falls back to null if not found (server will use Bun instead).
@@ -88,6 +86,10 @@ if (IS_WINDOWS && !NODE_SERVER_SCRIPT) {
     'server-node.mjs not found. Run `bun run build` to generate the Windows server bundle.'
   );
 }
+
+// The packaged Windows runtime ships server-node.mjs, not browse/src/server.ts.
+// Resolve the Bun/TypeScript entry point only on hosts that actually use it.
+const SERVER_SCRIPT = IS_WINDOWS ? null : resolveServerScript();
 
 interface ServerState {
   pid: number;
@@ -314,7 +316,7 @@ async function startServer(extraEnv?: Record<string, string>): Promise<ServerSta
   // server's own parseInt at server.ts:760.
   const parentPid = parseInt(process.env.BROWSE_PARENT_PID || '', 10) === 0 ? '0' : String(process.pid);
 
-  if (IS_WINDOWS && NODE_SERVER_SCRIPT) {
+  if (IS_WINDOWS) {
     // Windows: Bun.spawn() + proc.unref() doesn't truly detach on Windows —
     // when the CLI exits, the server dies with it. Use Node's child_process.spawn
     // with { detached: true } instead, which is the gold standard for Windows
@@ -322,10 +324,13 @@ async function startServer(extraEnv?: Record<string, string>): Promise<ServerSta
     const extraEnvStr = JSON.stringify({ BROWSE_STATE_FILE: config.stateFile, BROWSE_PARENT_PID: parentPid, ...(extraEnv || {}) });
     const launcherCode =
       `const{spawn}=require('child_process');` +
-      `spawn(process.execPath,[${JSON.stringify(NODE_SERVER_SCRIPT)}],` +
-      `{detached:true,stdio:['ignore','ignore','ignore'],env:Object.assign({},process.env,` +
+      `spawn(process.execPath,[${JSON.stringify(NODE_SERVER_SCRIPT!)}],` +
+      `{detached:true,windowsHide:true,stdio:['ignore','ignore','ignore'],env:Object.assign({},process.env,` +
       `${extraEnvStr})}).unref()`;
-    Bun.spawnSync(['node', '-e', launcherCode], { stdio: ['ignore', 'ignore', 'ignore'] });
+    Bun.spawnSync(['node', '-e', launcherCode], {
+      stdio: ['ignore', 'ignore', 'ignore'],
+      windowsHide: true,
+    });
   } else {
     // macOS/Linux: Bun.spawn().unref() only removes the child from Bun's event
     // loop — it does NOT call setsid(), so the spawned server stays in the
@@ -338,7 +343,7 @@ async function startServer(extraEnv?: Record<string, string>): Promise<ServerSta
     // which calls setsid() so the server becomes its own session leader
     // (PPID=1, STAT=Ss) and survives the spawning shell's exit. Mirrors
     // the Windows path's rationale — same root cause, different OS API.
-    nodeSpawn('bun', ['run', SERVER_SCRIPT], {
+    nodeSpawn('bun', ['run', SERVER_SCRIPT!], {
       detached: true,
       stdio: ['ignore', 'ignore', 'ignore'],
       env: { ...process.env, BROWSE_STATE_FILE: config.stateFile, BROWSE_PARENT_PID: parentPid, ...extraEnv },

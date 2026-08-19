@@ -77,6 +77,7 @@ export function spawnTerminalAgent(opts: {
       ...(opts.extraEnv || {}),
     },
     stdio: ['ignore', 'ignore', 'ignore'],
+    windowsHide: true,
   });
   proc.unref?.();
   return proc.pid ?? null;

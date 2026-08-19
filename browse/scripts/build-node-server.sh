@@ -48,7 +48,22 @@ perl -pi -e 's|import { Database } from "bun:sqlite";|const Database = null; // 
 
 mv "$DIST_DIR/server-node.tmp.mjs" "$DIST_DIR/server-node.mjs"
 
-# Step 4: Copy polyfill to dist/
+# Step 4: Copy the polyfill and external Node runtime dependencies to dist/.
+# Minimal host installs only receive browse/dist, so these packages must travel
+# with server-node.mjs instead of relying on the source checkout's node_modules.
 cp "$SRC_DIR/bun-polyfill.cjs" "$DIST_DIR/bun-polyfill.cjs"
+
+RUNTIME_NODE_MODULES="$DIST_DIR/node_modules"
+mkdir -p "$RUNTIME_NODE_MODULES"
+for package_name in playwright playwright-core diff; do
+  package_source="$GSTACK_DIR/node_modules/$package_name"
+  package_destination="$RUNTIME_NODE_MODULES/$package_name"
+  if [ ! -d "$package_source" ]; then
+    echo "Missing Node runtime dependency: $package_source" >&2
+    exit 1
+  fi
+  rm -rf "$package_destination"
+  cp -R "$package_source" "$package_destination"
+done
 
 echo "Node server bundle ready: $DIST_DIR/server-node.mjs"
